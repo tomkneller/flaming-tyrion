@@ -83,8 +83,9 @@ public class Screen extends Application{
 		sendBtn.setLayoutY(550);
 		sendBtn.setPrefWidth(80);
 		sendBtn.setText("Send");
-		sendBtn.setOnAction(sendBtnHandler);							//sends to the button handler where the bulk of code will be for the output, see if you can make an event handler for the input stream of data when receiving it will add automatically,
-		root.getChildren().add(sendBtn);									//also try to use the broadcast address if you can, may have to code in permissions, if to should be able to unicast so all IPs with a for loop judging the size of the loop by the subnet mask
+		sendBtn.setOnAction(sendBtnHandler);
+		sendBtn.setDefaultButton(true);
+		root.getChildren().add(sendBtn);									
 		
 		lbl2.setLayoutX(0);
 		lbl2.setLayoutY(585);
