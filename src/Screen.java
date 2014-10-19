@@ -12,7 +12,9 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 public class Screen extends Application{
 
@@ -79,12 +81,22 @@ public class Screen extends Application{
 		aboutMenu.getItems().addAll(aboutReadmeMenu, aboutCredits);
 		menuBar.getMenus().addAll(fileMenu, aboutMenu);
 		
+		
+		
 		//menu bar actions
 		fileExitMenu.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent close) {
 				System.exit(0);
 			}
+		});
+		
+		aboutCredits.setOnAction(new EventHandler<ActionEvent>(){
+			@Override
+			public void handle(ActionEvent e){
+				new creditsDialog(Screen.this);
+			}
+
 		});
 		
 		
@@ -131,3 +143,34 @@ public class Screen extends Application{
 	}
 
 }
+
+
+
+
+
+
+
+class creditsDialog {
+Screen parent;
+Label ct1;
+creditsDialog(Screen parent)
+{
+
+this.parent=parent;
+ct1 = new Label();
+ct1.setText("Programmed by :- \n Anton Wolfarth \n Thomas Kneller \n Alexander Savill \n Connor Unsworth");
+ct1.setLayoutX(40);
+ct1.setLayoutY(10);
+
+Stage dialogStage = new Stage();
+Pane dialogRoot = new Pane();
+dialogStage.setScene(new Scene(dialogRoot, 200, 200));
+dialogStage.setTitle("Credits");
+dialogRoot.getChildren().add(ct1);
+dialogStage.initStyle(StageStyle.UTILITY);
+dialogStage.initModality(Modality.WINDOW_MODAL);
+dialogStage.show();
+}
+}
+
+
