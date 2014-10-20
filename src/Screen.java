@@ -1,3 +1,7 @@
+import java.io.File;
+import java.util.List;
+import java.util.Scanner;
+
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -99,6 +103,14 @@ public class Screen extends Application{
 
 		});
 		
+		aboutReadmeMenu.setOnAction(new EventHandler<ActionEvent>(){
+			@Override
+			public void handle(ActionEvent a){
+				new readMeDialog(Screen.this);
+			}
+
+		});
+		
 		
 		//main layout
 		mainTxt.setLayoutX(0);
@@ -139,29 +151,21 @@ public class Screen extends Application{
 		rootBody.getChildren().add(sendBtn);									//also try to use the broadcast address if you can, may have to code in permissions, if to should be able to unicast so all IPs with a for loop judging the size of the loop by the subnet mask
 		
 		//footer
-		lbl2.setText(NAME + " was created by Anton Wolfarth & Thomas Kneller.");			//edit the string to add your name once you have made an edit, if the string starts getting too long you should be able to change the font size with .font() i think
+		lbl2.setText(NAME + " was created by Anton Wolfarth, Thomas Kneller & Connor Unsworth.");			//edit the string to add your name once you have made an edit, if the string starts getting too long you should be able to change the font size with .font() i think
 	}
 
 }
-
-
-
-
-
-
 
 class creditsDialog {
 Screen parent;
 Label ct1;
 creditsDialog(Screen parent)
 {
-
 this.parent=parent;
 ct1 = new Label();
 ct1.setText("Programmed by :- \n Anton Wolfarth \n Thomas Kneller \n Alexander Savill \n Connor Unsworth");
 ct1.setLayoutX(40);
 ct1.setLayoutY(10);
-
 Stage dialogStage = new Stage();
 Pane dialogRoot = new Pane();
 dialogStage.setScene(new Scene(dialogRoot, 200, 200));
@@ -173,4 +177,40 @@ dialogStage.show();
 }
 }
 
+
+//Creates dialog and uses scanner to parse ReadMe.md file and outputs contents
+
+class readMeDialog{
+Screen parent;
+TextArea rMD1;
+readMeDialog(Screen parent)
+{
+this.parent=parent;
+rMD1 = new TextArea();
+try{
+    File file = new File("README.md");
+    Scanner readMeScanner = new Scanner(file);
+    	
+    while(readMeScanner.hasNextLine())
+        {
+    		rMD1.appendText(readMeScanner.nextLine() + "\n");
+        }
+	}
+catch(Exception ex)
+    {
+        
+		rMD1.setText("Oops. The ReadMe file seems to be missing");	
+    }
+rMD1.setLayoutX(30);
+rMD1.setLayoutY(10);
+Stage dialogStage = new Stage();
+Pane dialogRoot = new Pane();
+dialogStage.setScene(new Scene(dialogRoot, 590, 200));
+dialogStage.setTitle("ReadMe");
+dialogRoot.getChildren().add(rMD1);
+dialogStage.initStyle(StageStyle.UTILITY);
+dialogStage.initModality(Modality.WINDOW_MODAL);
+dialogStage.show();
+}
+}
 
