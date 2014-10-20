@@ -1,3 +1,5 @@
+
+
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -139,7 +141,7 @@ public class Screen extends Application{
 		rootBody.getChildren().add(sendBtn);									//also try to use the broadcast address if you can, may have to code in permissions, if to should be able to unicast so all IPs with a for loop judging the size of the loop by the subnet mask
 		
 		//footer
-		lbl2.setText(NAME + " was created by Anton Wolfarth & Thomas Kneller.");			//edit the string to add your name once you have made an edit, if the string starts getting too long you should be able to change the font size with .font() i think
+		lbl2.setText(NAME + " was created by Anton Wolfarth, Alexander Savill,  Connor Unsworth & Thomas Kneller.");			//edit the string to add your name once you have made an edit, if the string starts getting too long you should be able to change the font size with .font() i think
 	}
 
 }
@@ -150,27 +152,21 @@ public class Screen extends Application{
 
 
 
-class creditsDialog {
-Screen parent;
-Label ct1;
-creditsDialog(Screen parent)
-{
+class creditsDialog {Screen parent;Label ct1;creditsDialog(Screen parent){
 
-this.parent=parent;
-ct1 = new Label();
-ct1.setText("Programmed by :- \n Anton Wolfarth \n Thomas Kneller \n Alexander Savill \n Connor Unsworth");
-ct1.setLayoutX(40);
-ct1.setLayoutY(10);
-
-Stage dialogStage = new Stage();
-Pane dialogRoot = new Pane();
-dialogStage.setScene(new Scene(dialogRoot, 200, 200));
-dialogStage.setTitle("Credits");
-dialogRoot.getChildren().add(ct1);
-dialogStage.initStyle(StageStyle.UTILITY);
-dialogStage.initModality(Modality.WINDOW_MODAL);
-dialogStage.show();
+	this.parent=parent;
+	ct1 = new Label();
+	ct1.setText("Programmed by :- \n Anton Wolfarth \n Thomas Kneller \n Alexander Savill \n Connor Unsworth");
+	ct1.setLayoutX(40);
+	ct1.setLayoutY(10);
+	
+	Stage dialogStage = new Stage();
+	Pane dialogRoot = new Pane();
+	dialogStage.setScene(new Scene(dialogRoot, 200, 200));
+	dialogStage.setTitle("Credits");
+	dialogRoot.getChildren().add(ct1);
+	dialogStage.initStyle(StageStyle.UTILITY);
+	dialogStage.initModality(Modality.WINDOW_MODAL);
+	dialogStage.show();
 }
 }
-
-
