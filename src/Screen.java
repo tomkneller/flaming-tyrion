@@ -1,5 +1,6 @@
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Scanner;
@@ -18,6 +19,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -37,14 +39,16 @@ public class Screen extends Application{
 	private MenuBar menuBar = new MenuBar();
 	
 	private Menu fileMenu = new Menu("File");							//MenuBar/file
-	private MenuItem fileRandomthing1 = new MenuItem("randomthing1");
-	private MenuItem fileRandomthing2 = new MenuItem("randomthing2");
+	private MenuItem saveChat1 = new MenuItem("Save Chat");
+	private MenuItem loadChat1 = new MenuItem("Load Chat");
 	private MenuItem fileExitMenu = new MenuItem("Exit");
 	
 	private Menu aboutMenu = new Menu("About");							//MenuBar/About
 	private MenuItem aboutReadmeMenu = new MenuItem("Readme");
 	private MenuItem aboutCredits = new MenuItem("Credits");
 	private MenuItem aboutUpdate = new MenuItem("Check For Updates");
+	
+	protected String textArea = null;
 	
 	
 	
@@ -77,13 +81,14 @@ public class Screen extends Application{
 				//update mainTxt through receiving broadcast
 				String message = ">" + userTxt.getText() + ": " + messageTxt.getText() + "\n";
 				mainTxt.appendText(message);
+				textArea = textArea + "," + message;
 				messageTxt.clear();
 			}	
 		};
 		
 		
 		// Assembling the menu bar
-		fileMenu.getItems().addAll(fileRandomthing1, new SeparatorMenuItem(), fileRandomthing2, new SeparatorMenuItem(), fileExitMenu);
+		fileMenu.getItems().addAll(saveChat1, new SeparatorMenuItem(), loadChat1, new SeparatorMenuItem(), fileExitMenu);
 		aboutMenu.getItems().addAll(aboutReadmeMenu, aboutCredits,aboutUpdate);
 		menuBar.getMenus().addAll(fileMenu, aboutMenu);
 		
@@ -94,6 +99,13 @@ public class Screen extends Application{
 			@Override
 			public void handle(ActionEvent close) {
 				System.exit(0);
+			}
+		});
+		
+		saveChat1.setOnAction(new EventHandler<ActionEvent>(){
+			@Override
+			public void handle(ActionEvent c){
+				new saveDialog(Screen.this);
 			}
 		});
 		
@@ -165,63 +177,98 @@ public class Screen extends Application{
 		lbl2.setText(NAME + " was created by Anton Wolfarth, Thomas Kneller, Alexander Savill & Connor Unsworth.");			//edit the string to add your name once you have made an edit, if the string starts getting too long you should be able to change the font size with .font() i think
 
 	}
+	
+	//connects to Github and downloads the most recent readMe.md file and compares it with file which is
+	//being used.  If its different gives an output.
+	public String checkUpdate()
+	{
+		try{
+			URL url = new URL("https://github.com/WolfAntian/flaming-tyrion/blob/master/README.md");
+			Scanner onlineUpdate = new Scanner(url.openStream()); 	
+		try{
+		    File file = new File("README.md");
+		    Scanner localUpdate = new Scanner(file);
+		    
+		    String onlineVersion = null;
+		    String localVersion = null;
+		    
+		    while(onlineUpdate.hasNextLine())
+		    {
+		    	if (onlineUpdate.nextLine().contains("version:"))
+		    	{
+		    		onlineVersion = (onlineUpdate.nextLine());
+		    	}
+		    }
+		    
+		    while(localUpdate.hasNextLine())
+		        {
+		    	if (localUpdate.nextLine().contains("version:"))
+		    	{
+		    		localVersion = (localUpdate.nextLine());
+		    	}
+		        }
+		    if (!onlineVersion.contains(localVersion))
+		    {
+		    	onlineUpdate.close();
+		    	localUpdate.close();
+		    	return("Unfortunately you have an old version");
+		    }
+		    else 
+		    {
+		    	onlineUpdate.close();
+		    	localUpdate.close();
+		    	return("Your all good! Your version is up to date.");
+		    	
+		    }
+		}       	
+		catch(Exception ex)
+		    {  
+			onlineUpdate.close();	
+			return("Oops there has been an error. Sorry! :(");
+		    }
+		}
+		catch(IOException downloadError)
+		{	
+			return("Sorry but a connection cannot be established to us.");
+		}
+	}
 
 
-//connects to Github and downloads the most recent readMe.md file and compares it with file which is
-//being used.  If its different gives an output.
-public String checkUpdate()
+//allows access to chat
+public String getText()
 {
-	try{
-		URL url = new URL("https://github.com/WolfAntian/flaming-tyrion/blob/master/README.md");
-		Scanner onlineUpdate = new Scanner(url.openStream()); 	
-	try{
-	    File file = new File("README.md");
-	    Scanner localUpdate = new Scanner(file);
-	    
-	    String onlineVersion = null;
-	    String localVersion = null;
-	    
-	    while(onlineUpdate.hasNextLine())
-	    {
-	    	if (onlineUpdate.nextLine().contains("version:"))
-	    	{
-	    		onlineVersion = (onlineUpdate.nextLine());
-	    	}
-	    }
-	    
-	    while(localUpdate.hasNextLine())
-	        {
-	    	if (localUpdate.nextLine().contains("version:"))
-	    	{
-	    		localVersion = (localUpdate.nextLine());
-	    	}
-	        }
-	    if (!onlineVersion.contains(localVersion))
-	    {
-	    	onlineUpdate.close();
-	    	localUpdate.close();
-	    	return("Unfortunately you have an old version");
-	    }
-	    else 
-	    {
-	    	onlineUpdate.close();
-	    	localUpdate.close();
-	    	return("Your all good! Your version is up to date.");
-	    	
-	    }
-	}       	
-	catch(Exception ex)
-	    {  
-		onlineUpdate.close();	
-		return("Oops there has been an error. Sorry! :(");
-	    }
-	}
-	catch(IOException downloadError)
-	{	
-		return("Sorry but a connection cannot be established to us.");
-	}
+	return textArea;
 }
 
+//opens dialog and user can save chat to location
+class saveDialog {Screen parent;saveDialog(Screen parent){
+
+	this.parent=parent;
+	Stage dialogStage = new Stage();
+	DirectoryChooser directoryChooser = new DirectoryChooser();
+	File selectedDirectory = directoryChooser.showDialog(dialogStage);
+	 if(selectedDirectory == null){
+         System.out.println("Error");
+     }else{
+         System.out.println(selectedDirectory.getAbsolutePath());     
+     }
+	 String location = selectedDirectory.toString();
+	 
+	 try {
+
+		 File newChatFile = new File(location + "/chat.chat");
+		 FileWriter fileWriter = null;
+		 fileWriter = new FileWriter(newChatFile);
+		 fileWriter.write(getText());
+		 fileWriter.close();
+		 System.out.println("File is being saved");
+	 } catch (IOException e) {
+		 System.out.println("Error message here");
+	}
+	
+	
+}
+}
 
 class creditsDialog {Screen parent;Label ct1;creditsDialog(Screen parent){
 
@@ -242,6 +289,7 @@ class creditsDialog {Screen parent;Label ct1;creditsDialog(Screen parent){
 }
 }
 
+
 //Creates dialog and uses scanner to parse ReadMe.md file and outputs contents
 class readMeDialog{Screen parent;TextArea rMD1;readMeDialog(Screen parent){
 
@@ -250,15 +298,12 @@ class readMeDialog{Screen parent;TextArea rMD1;readMeDialog(Screen parent){
 	try{
 	    File file = new File("README.md");
 	    Scanner readMeScanner = new Scanner(file);
-	    	
 	    while(readMeScanner.hasNextLine())
 	        {
 	    		rMD1.appendText(readMeScanner.nextLine() + "\n");
-	   
 	        }
-	    readMeScanner.close();
-		}
-	
+	    		readMeScanner.close();	
+			}
 	catch(Exception ex)
 	    {  
 			rMD1.setText("Oops. The ReadMe file seems to be missing");	
@@ -325,8 +370,6 @@ EventHandler<ActionEvent> updateButtonHandler = new EventHandler<ActionEvent>(){
 
 }
 };
-
-
 }
 }
 

@@ -1,7 +1,6 @@
 flaming-tyrion
 ==============
-version:
-0.8
 README
+version:0.4
 +
 This chat client etc ect ect
