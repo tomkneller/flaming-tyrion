@@ -1,5 +1,7 @@
 
 import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 import java.util.Scanner;
 
 import javafx.application.Application;
@@ -54,6 +56,7 @@ public class Screen extends Application{
 	@Override
 	public void start(Stage primaryStage){
 		
+		checkUpdate();
 		BorderPane root = new BorderPane();
 		Pane rootBody = new Pane();
 		root.setTop(menuBar);
@@ -155,10 +158,51 @@ public class Screen extends Application{
 		lbl2.setText(NAME + " was created by Anton Wolfarth, Thomas Kneller, Alexander Savill & Connor Unsworth.");			//edit the string to add your name once you have made an edit, if the string starts getting too long you should be able to change the font size with .font() i think
 
 	}
+
+
+
+public void checkUpdate()
+{
+	try{
+		URL url = new URL("https://github.com/WolfAntian/flaming-tyrion/blob/master/README.md");
+		Scanner onlineUpdate = new Scanner(url.openStream()); 	
+	try{
+	    File file = new File("README.md");
+	    Scanner localUpdate = new Scanner(file);
+	    
+	    String onlineVersion = null;
+	    String localVersion = null;
+	    
+	    while(onlineUpdate.hasNextLine())
+	    {
+	    	if (onlineUpdate.nextLine().contains("version:"))
+	    	{
+	    		onlineVersion = (onlineUpdate.nextLine());
+	    	}
+	    }
+	    
+	    while(localUpdate.hasNextLine())
+	        {
+	    	if (localUpdate.nextLine().contains("version:"))
+	    	{
+	    		localVersion = (localUpdate.nextLine());
+	    	}
+	        }
+	    if (!onlineVersion.contains(localVersion))
+	    {
+	    	System.out.println("Unfortunately you have an old version");
+	    }
+	}       	
+	catch(Exception ex)
+	    {  
+			System.out.println("Oops there has been an error. Sorry! :(");
+	    }
+	}
+	catch(IOException downloadError)
+	{
+		System.out.println("Sorry but a connection cannot be established to us.");
+	}
 }
-
-
-
 
 
 class creditsDialog {Screen parent;Label ct1;creditsDialog(Screen parent){
@@ -211,6 +255,6 @@ class readMeDialog{Screen parent;TextArea rMD1;readMeDialog(Screen parent){
 	dialogStage.show();
 }
 }
-
+}
 
 
