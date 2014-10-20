@@ -44,7 +44,7 @@ public class Screen extends Application{
 	private Menu aboutMenu = new Menu("About");							//MenuBar/About
 	private MenuItem aboutReadmeMenu = new MenuItem("Readme");
 	private MenuItem aboutCredits = new MenuItem("Credits");
-	
+	private MenuItem aboutUpdate = new MenuItem("Check For Updates");
 	
 	
 	
@@ -56,7 +56,6 @@ public class Screen extends Application{
 	@Override
 	public void start(Stage primaryStage){
 		
-		checkUpdate();
 		BorderPane root = new BorderPane();
 		Pane rootBody = new Pane();
 		root.setTop(menuBar);
@@ -85,7 +84,7 @@ public class Screen extends Application{
 		
 		// Assembling the menu bar
 		fileMenu.getItems().addAll(fileRandomthing1, new SeparatorMenuItem(), fileRandomthing2, new SeparatorMenuItem(), fileExitMenu);
-		aboutMenu.getItems().addAll(aboutReadmeMenu, aboutCredits);
+		aboutMenu.getItems().addAll(aboutReadmeMenu, aboutCredits,aboutUpdate);
 		menuBar.getMenus().addAll(fileMenu, aboutMenu);
 		
 		
@@ -114,6 +113,14 @@ public class Screen extends Application{
 
 		});
 		
+		aboutUpdate.setOnAction(new EventHandler<ActionEvent>(){
+			@Override
+			public void handle(ActionEvent b){
+				String results = checkUpdate();
+				new updateDialog(Screen.this,results);
+			}
+
+		});
 		
 		//main layout
 		mainTxt.setLayoutX(0);
@@ -160,8 +167,9 @@ public class Screen extends Application{
 	}
 
 
-
-public void checkUpdate()
+//connects to Github and downloads the most recent readMe.md file and compares it with file which is
+//being used.  If its different gives an output.
+public String checkUpdate()
 {
 	try{
 		URL url = new URL("https://github.com/WolfAntian/flaming-tyrion/blob/master/README.md");
@@ -190,17 +198,27 @@ public void checkUpdate()
 	        }
 	    if (!onlineVersion.contains(localVersion))
 	    {
-	    	System.out.println("Unfortunately you have an old version");
+	    	onlineUpdate.close();
+	    	localUpdate.close();
+	    	return("Unfortunately you have an old version");
+	    }
+	    else 
+	    {
+	    	onlineUpdate.close();
+	    	localUpdate.close();
+	    	return("Your all good! Your version is up to date.");
+	    	
 	    }
 	}       	
 	catch(Exception ex)
 	    {  
-			System.out.println("Oops there has been an error. Sorry! :(");
+		onlineUpdate.close();	
+		return("Oops there has been an error. Sorry! :(");
 	    }
 	}
 	catch(IOException downloadError)
-	{
-		System.out.println("Sorry but a connection cannot be established to us.");
+	{	
+		return("Sorry but a connection cannot be established to us.");
 	}
 }
 
@@ -224,7 +242,6 @@ class creditsDialog {Screen parent;Label ct1;creditsDialog(Screen parent){
 }
 }
 
-
 //Creates dialog and uses scanner to parse ReadMe.md file and outputs contents
 class readMeDialog{Screen parent;TextArea rMD1;readMeDialog(Screen parent){
 
@@ -237,8 +254,11 @@ class readMeDialog{Screen parent;TextArea rMD1;readMeDialog(Screen parent){
 	    while(readMeScanner.hasNextLine())
 	        {
 	    		rMD1.appendText(readMeScanner.nextLine() + "\n");
+	   
 	        }
+	    readMeScanner.close();
 		}
+	
 	catch(Exception ex)
 	    {  
 			rMD1.setText("Oops. The ReadMe file seems to be missing");	
@@ -255,6 +275,60 @@ class readMeDialog{Screen parent;TextArea rMD1;readMeDialog(Screen parent){
 	dialogStage.show();
 }
 }
+
+//Loads an update Dialog Screen
+class updateDialog{Screen parent;Label updateText1;Button updateButton;updateDialog(Screen parent, String results){
+
+	this.parent=parent;
+	updateText1 = new Label();
+	updateText1.setLayoutX(30);
+	updateText1.setLayoutY(10);
+	Stage dialogStage = new Stage();
+	Pane dialogRoot = new Pane();
+	dialogStage.setScene(new Scene(dialogRoot, 300, 200));
+	dialogStage.setTitle("Updates");
+	updateText1.setText(results);
+	if(results.equals("Unfortunately you have an old version"))
+	{
+		updateButton = new Button();
+		updateButton.setLayoutX(98);
+		updateButton.setLayoutY(90);
+		updateButton.setPrefWidth(80);
+		updateButton.setText("Download");
+		updateButton.setOnAction(updateButtonHandler);							//sends to the button handler where the bulk of code will be for the output, see if you can make an event handler for the input stream of data when receiving it will add automatically,
+		updateButton.setDefaultButton(true);
+		dialogRoot.getChildren().add(updateButton);
+	}
+	
+	dialogRoot.getChildren().add(updateText1);
+	dialogStage.initStyle(StageStyle.UTILITY);
+	dialogStage.initModality(Modality.WINDOW_MODAL);
+	dialogStage.show();
 }
+
+//button handler
+EventHandler<ActionEvent> updateButtonHandler = new EventHandler<ActionEvent>(){
+	
+	@Override
+	public void handle(ActionEvent arg0) {
+		//dummy for presentation
+		//change to send as broadcast
+		//update mainTxt through receiving broadcast
+		String htmlFile = new String("https://github.com/WolfAntian/flaming-tyrion/archive/master.zip");
+		try{
+			java.awt.Desktop.getDesktop().browse(java.net.URI.create(htmlFile));
+		}
+		catch(Exception ex)
+		{
+	         System.out.println("url error");
+		}	
+
+}
+};
+
+
+}
+}
+
 
 
