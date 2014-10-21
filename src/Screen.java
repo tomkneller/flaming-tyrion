@@ -20,6 +20,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -106,6 +107,13 @@ public class Screen extends Application{
 			@Override
 			public void handle(ActionEvent c){
 				new saveDialog(Screen.this);
+			}
+		});
+		
+		loadChat1.setOnAction(new EventHandler<ActionEvent>(){
+			@Override
+			public void handle(ActionEvent c){
+				new loadDialog(Screen.this);
 			}
 		});
 		
@@ -266,6 +274,38 @@ class saveDialog {Screen parent;saveDialog(Screen parent){
 		 System.out.println("Error message here");
 	}
 	
+	
+}
+}
+
+//opens dialog and user can save chat to location
+class loadDialog {Screen parent;loadDialog(Screen parent){
+
+	this.parent=parent;
+	Stage dialogStage = new Stage();
+	FileChooser fileChooser = new FileChooser();
+	FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("chat Files (*.chat)","*.chat");
+	fileChooser.getExtensionFilters().add(extFilter);
+	File file = fileChooser.showOpenDialog(dialogStage);
+	if(file == null){
+       System.out.println("You Havent Selected a path");
+   }else{
+      
+	 try {
+		 	Scanner fileReader = new Scanner(file);
+		 	fileReader.useDelimiter(",");
+		 	while (fileReader.hasNext()){
+		 		String nextLine = fileReader.next();
+		 		if (nextLine.contains("null"))
+		 			nextLine = fileReader.next();
+		 		mainTxt.appendText(nextLine);
+		 	}
+		
+		 System.out.println("File is being opened");
+	 } catch (IOException e) {
+		 System.out.println("Error message here");
+	}
+   }
 	
 }
 }
