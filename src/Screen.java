@@ -10,6 +10,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
@@ -27,13 +28,13 @@ import javafx.stage.StageStyle;
 
 public class Screen extends Application{
 
-	private final String NAME = "BroadChat_v0.2.1"; 			//name, add any changes add to the v no.
+	private final String NAME = "BroadChat_v0.2.2"; 			//name, add any changes add to the v no.
 	
 	private TextArea mainTxt = new TextArea();					//main area where the conversation appears
 	private TextField userTxt = new TextField();				//user name
 	private TextField messageTxt = new TextField();				//message to send
 	private final Label lbl1 = new Label();						//label for the ':' that goes in between the userTxt and messageTxt
-	private Button sendBtn = new Button();						//kinda obvious
+	private Button sendBtn = new Button();						//Kind of obvious
 	private final Label lbl2 = new Label();						//used as a footer, add to it if you add anything, ill mark where later in the code
 	
 	//Menu bar Items
@@ -60,6 +61,8 @@ public class Screen extends Application{
 
 	@Override
 	public void start(Stage primaryStage){
+		
+	
 		
 		BorderPane root = new BorderPane();
 		Pane rootBody = new Pane();
@@ -310,19 +313,67 @@ class loadDialog {Screen parent;loadDialog(Screen parent){
 }
 }
 
-class creditsDialog {Screen parent;Label ct1;creditsDialog(Screen parent){
+class creditsDialog {Screen parent;Label lblCreditsDialogHeader;Hyperlink name1;Hyperlink name2;Hyperlink name3;Hyperlink name4;creditsDialog(Screen parent){
 
 	this.parent=parent;
-	ct1 = new Label();
-	ct1.setText("Programmed by :- \n Anton Wolfarth \n Thomas Kneller \n Alexander Savill \n Connor Unsworth");
-	ct1.setLayoutX(40);
-	ct1.setLayoutY(10);
+	lblCreditsDialogHeader = new Label();
+	lblCreditsDialogHeader.setText("Programmers");
+	lblCreditsDialogHeader.setLayoutX(50);
+	lblCreditsDialogHeader.setLayoutY(10);
+	
+	name1 = new Hyperlink("www.twitter.com");
+	name1.setText("Anton Wolfarth");
+	name1.setLayoutX(50);
+	name1.setLayoutY(35);
+	name1.setOnAction(new EventHandler<ActionEvent>() {
+	    @Override
+	    public void handle(ActionEvent hyperlink) 
+	    {
+	    	getHostServices().showDocument("https://github.com/WolfAntian");
+	    }
+	    });
+		
+	name2 = new Hyperlink();
+	name2.setText("Thomas Kneller");
+	name2.setLayoutX(50);
+	name2.setLayoutY(60);
+	name2.setOnAction(new EventHandler<ActionEvent>() {
+	    @Override
+	    public void handle(ActionEvent hyperlink) 
+	    {
+	    	getHostServices().showDocument("https://github.com/tomkneller");
+	    }
+	    });
+	
+	name3 = new Hyperlink();
+	name3.setText("Alexander Savill");
+	name3.setLayoutX(50);
+	name3.setLayoutY(85);
+	name3.setOnAction(new EventHandler<ActionEvent>() {
+	    @Override
+	    public void handle(ActionEvent hyperlink) 
+	    {
+	    	getHostServices().showDocument("https://github.com/rednaz5");
+	    }
+	    });
+	
+	name4 = new Hyperlink();
+	name4.setText("Connor Unsworth");
+	name4.setLayoutX(50);
+	name4.setLayoutY(110);
+	name4.setOnAction(new EventHandler<ActionEvent>() {
+	    @Override
+	    public void handle(ActionEvent hyperlink) 
+	    {
+	    	getHostServices().showDocument("https://github.com/ConnorUnsworth");
+	    }
+	    });
 	
 	Stage dialogStage = new Stage();
 	Pane dialogRoot = new Pane();
 	dialogStage.setScene(new Scene(dialogRoot, 200, 200));
 	dialogStage.setTitle("Credits");
-	dialogRoot.getChildren().add(ct1);
+	dialogRoot.getChildren().addAll(lblCreditsDialogHeader,name1 ,name2 ,name3 ,name4);
 	dialogStage.initStyle(StageStyle.UTILITY);
 	dialogStage.initModality(Modality.WINDOW_MODAL);
 	dialogStage.show();
