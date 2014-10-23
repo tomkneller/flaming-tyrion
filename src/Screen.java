@@ -1,4 +1,6 @@
 
+
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileWriter;
@@ -45,7 +47,7 @@ public class Screen extends Application{
 	private final String NAME = "BroadChat_v0.2.2"; 			//name, add any changes add to the v no.
 
 	protected TextArea mainTxt = new TextArea(); 					//main area where the conversation appears
-	private TextField userTxt = new TextField();				//user name
+	private static Label userTxt = new Label();					//user name
 	private TextField messageTxt = new TextField();				//message to send
 	private final Label lbl1 = new Label();						//label for the ':' that goes in between the userTxt and messageTxt
 	private Button sendBtn = new Button();						//Kind of obvious
@@ -58,7 +60,8 @@ public class Screen extends Application{
 	private MenuItem saveChat1 = new MenuItem("Save Chat");
 	private MenuItem loadChat1 = new MenuItem("Load Chat");
 	private MenuItem fileExitMenu = new MenuItem("Exit");
-
+	private MenuItem fileChangeUserMenu = new MenuItem("Change User");
+	
 	private Menu aboutMenu = new Menu("About");							//MenuBar/About
 	private MenuItem aboutReadmeMenu = new MenuItem("Readme");
 	private MenuItem aboutCredits = new MenuItem("Credits");
@@ -129,7 +132,7 @@ public class Screen extends Application{
 				
 				messageTxt.setText("");
 				messageTxt.requestFocus();
-				userTxt.setText("");
+				
 		
 				
 				}
@@ -152,7 +155,7 @@ public class Screen extends Application{
 
 
 		// Assembling the menu bar
-		fileMenu.getItems().addAll(saveChat1, new SeparatorMenuItem(), loadChat1, new SeparatorMenuItem(), fileExitMenu);
+		fileMenu.getItems().addAll(saveChat1, new SeparatorMenuItem(), loadChat1, new SeparatorMenuItem(), fileChangeUserMenu, new SeparatorMenuItem(), fileExitMenu);
 		aboutMenu.getItems().addAll(aboutReadmeMenu, aboutCredits,aboutUpdate);
 		menuBar.getMenus().addAll(fileMenu, aboutMenu);
 
@@ -163,6 +166,14 @@ public class Screen extends Application{
 				System.exit(0);
 			}
 		});
+		
+		fileChangeUserMenu.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent c) {
+				new loginDialog(Screen.this);
+			}
+		});
+		
 		
 		saveChat1.setOnAction(new EventHandler<ActionEvent>(){
 			@Override
@@ -210,8 +221,8 @@ public class Screen extends Application{
 		userTxt.setLayoutX(0);
 		userTxt.setLayoutY(530);
 		userTxt.setPrefWidth(150);
-		userTxt.setPrefColumnCount(12);
-		userTxt.setText("User Name");
+		
+		//userTxt.setText("User Name");
 		rootBody.getChildren().add(userTxt);
 
 		lbl1.setLayoutX(154);
@@ -385,6 +396,10 @@ public class Screen extends Application{
 	
 	
 	
+	
+
+	
+	
 	//Connor where is a nice description of your method explaining what it does?
 	
 	class creditsDialog {Screen parent;Label lblCreditsDialogHeader;Hyperlink name1;Hyperlink name2;Hyperlink name3;Hyperlink name4;creditsDialog(Screen parent){
@@ -523,6 +538,48 @@ public class Screen extends Application{
 
 	}
 	
+	class loginDialog {Screen parent; Label lbluserNameLoginHeader;TextField userTxt;Button userConfirm;loginDialog(Screen parent){
+		this.parent=parent;
+		lbluserNameLoginHeader = new Label();
+		lbluserNameLoginHeader.setText("Enter your user name");
+		lbluserNameLoginHeader.setLayoutX(50);
+		lbluserNameLoginHeader.setLayoutY(10);
+
+		userTxt = new TextField();
+		userTxt.setLayoutX(10);
+		userTxt.setLayoutY(30);
+		lbluserNameLoginHeader.requestFocus();
+		userTxt.setPromptText("User Name");
+		//Clears Dialog Box for data entry//
+		
+		
+		//Confirmation Button to confirm new User name//
+		userConfirm = new Button();
+		userConfirm.setText("OK");
+		userConfirm.setLayoutX(75);
+		userConfirm.setLayoutY(75);
+		userConfirm.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent onFocus) 
+			{
+				System.out.println("set username in main screen");
+			   Screen.userTxt.setText(userTxt.getText());
+
+			}
+		});
+		
+		Stage dialogStage = new Stage();
+		Pane dialogRoot = new Pane();
+		dialogStage.setScene(new Scene(dialogRoot, 200, 200));
+		dialogStage.setTitle("Change User Name");
+		dialogRoot.getChildren().addAll(lbluserNameLoginHeader,userTxt ,userConfirm);
+		dialogStage.initStyle(StageStyle.UTILITY);
+		dialogStage.initModality(Modality.WINDOW_MODAL);
+		dialogStage.show();
+	}
+	}
+
+	
 	//button handler
 			EventHandler<ActionEvent> updateButtonHandler = new EventHandler<ActionEvent>(){
 				
@@ -554,7 +611,7 @@ public class Screen extends Application{
 
 	private void setUpNetworking() {
 		try {
-			sock = new Socket("", 4550); ///////INSERT IP OF HOST HERE//////
+			sock = new Socket("localHost", 16261); ///////INSERT IP OF HOST HERE//////
 			InputStreamReader streamReader = new InputStreamReader(sock.getInputStream());
 			reader = new BufferedReader(streamReader);
 			writer = new PrintWriter(sock.getOutputStream());
@@ -571,7 +628,7 @@ public class Screen extends Application{
 	/**
 	 * Have you ever seen Java cod so grand? Look at this beautiful thread. Un-phased by the Java FX UI thread,
 	 * this thread takes things into its own hands and updates the mainTxt TextArea each time the reader reads something 
-	 * from the buffer. It really is a peice of art.
+	 * from the buffer. It really is a piece of art.
 	 */
 	
 	
@@ -598,6 +655,7 @@ public class Screen extends Application{
 	};
 	
 }
+
 		
 
 
