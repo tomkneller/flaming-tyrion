@@ -1,6 +1,14 @@
 flaming-tyrion
 ==============
 README
+Version:0.7.2
++
+Code CleanUp
+
+Version:0.7.1
++
+Can change font colour
+
 Version:0.7
 +
 Can change userName, user name now fixed
