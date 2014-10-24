@@ -10,14 +10,16 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.URL;
 import java.util.Scanner;
-import java.util.TimerTask;
 
+import javax.swing.JEditorPane;
 import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
+import javax.swing.JTextPane;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultStyledDocument;
+import javax.swing.text.Style;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyleContext;
 
-import com.sun.glass.ui.Timer;
-
-import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -25,17 +27,21 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputControl;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.web.HTMLEditor;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
@@ -45,7 +51,8 @@ import javafx.stage.StageStyle;
 public class Screen extends Application{
 
 	private final String NAME = "BroadChat_v0.2.2"; 			//name, add any changes add to the v no.
-
+	protected int i =0;
+	DefaultStyledDocument document = new DefaultStyledDocument();
 	protected TextArea mainTxt = new TextArea(); 					//main area where the conversation appears
 	private static Label userTxt = new Label();					//user name
 	private TextField messageTxt = new TextField();				//message to send
@@ -86,7 +93,7 @@ public class Screen extends Application{
 
 
 	@Override
-	public void start(Stage primaryStage){
+	public void start(Stage primaryStage) throws BadLocationException{
 		
 		
 
@@ -96,7 +103,19 @@ public class Screen extends Application{
 		root.setCenter(rootBody);
 		root.setBottom(lbl2);
 
-		Scene scene = new Scene(root,800,600);
+		//THIS BIT TOM!!!!!!!!!!!!!!!!!!!!!
+		//Ready bake code that lets you change the colour of the chat.
+		ColorPicker colorPicker = new ColorPicker(Color.BLACK);
+        colorPicker.valueProperty().addListener((observable, oldColor, newColor) ->
+            mainTxt.setStyle(
+              "-fx-text-fill: " + toRgbString(newColor) + ";"
+            )
+        );
+		
+        //AND THIS BIT TOM!!!!!!!!!
+        Scene scene = new Scene(new VBox(root,colorPicker),800,600);
+        
+        
 		primaryStage.setTitle(NAME);
 		primaryStage.setScene(scene);
 		
@@ -110,8 +129,7 @@ public class Screen extends Application{
 		th.setDaemon(true);
 		th.start();
 		
-		
-
+	
 		primaryStage.show();
 		
 		//Send button handler
@@ -121,7 +139,10 @@ public class Screen extends Application{
 			@Override
 			public void handle(ActionEvent e) {
 				
+				
+				
 				try {
+					userTxt.setTextFill(Color.web("#0076a3"));
 					writer.println(userTxt.getText() + ": " + messageTxt.getText());
 					writer.flush();
 
@@ -150,10 +171,10 @@ public class Screen extends Application{
 		mainTxt.setPrefHeight(530);
 		mainTxt.setWrapText(true);
 		mainTxt.setEditable(false);
+		
 		rootBody.getChildren().add(mainTxt);
 		
-
-
+		
 		// Assembling the menu bar
 		fileMenu.getItems().addAll(saveChat1, new SeparatorMenuItem(), loadChat1, new SeparatorMenuItem(), fileChangeUserMenu, new SeparatorMenuItem(), fileExitMenu);
 		aboutMenu.getItems().addAll(aboutReadmeMenu, aboutCredits,aboutUpdate);
@@ -254,7 +275,7 @@ public class Screen extends Application{
 		
 		//footer
 
-		lbl2.setText(NAME + " was created by Anton Wolfarth, Thomas Kneller, Alexander Savill & Connor Unsworth.");	
+		//lbl2.setText(NAME + " was created by Anton Wolfarth, Thomas Kneller, Alexander Savill & Connor Unsworth.");	
 		
 		//edit the string to add your name once you have made an edit, if the string starts getting too long you should be able to change the font size with .font() i think
 
@@ -563,9 +584,11 @@ public class Screen extends Application{
 			public void handle(ActionEvent onFocus) 
 			{
 				System.out.println("set username in main screen");
-			   Screen.userTxt.setText(userTxt.getText());
-
+			   Screen.userTxt.setText("Alex");
+			   System.out.println(userTxt.getText());
+			   i =1;
 			}
+			
 		});
 		
 		Stage dialogStage = new Stage();
@@ -611,7 +634,7 @@ public class Screen extends Application{
 
 	private void setUpNetworking() {
 		try {
-			sock = new Socket("localHost", 16261); ///////INSERT IP OF HOST HERE//////
+			sock = new Socket("86.155.76.179", 16261); ///////INSERT IP OF HOST HERE//////
 			InputStreamReader streamReader = new InputStreamReader(sock.getInputStream());
 			reader = new BufferedReader(streamReader);
 			writer = new PrintWriter(sock.getOutputStream());
@@ -623,10 +646,24 @@ public class Screen extends Application{
 			ex.printStackTrace();
 		}
 	}
+	
+	
+	//THIS METHOD TOM!!!!!!!!!!!!!!!!!!!!!!!!!!!!.
+	private int to255Int(double d) {
+        return (int) (d * 255);
+    }
+	// AND THIS METHOD TOM!!!!!!!!!!!!!!!.
+	 private String toRgbString(Color colour) {
+	        return "rgb("
+	                          + to255Int(colour.getRed())
+	                    + "," + to255Int(colour.getGreen())
+	                    + "," + to255Int(colour.getBlue())
+	             + ")";
+	    }
 
 	
 	/**
-	 * Have you ever seen Java cod so grand? Look at this beautiful thread. Un-phased by the Java FX UI thread,
+	 * Have you ever seen Java code so grand? Look at this beautiful thread. Un-phased by the Java FX UI thread,
 	 * this thread takes things into its own hands and updates the mainTxt TextArea each time the reader reads something 
 	 * from the buffer. It really is a piece of art.
 	 */
@@ -641,7 +678,9 @@ public class Screen extends Application{
 	    	   Platform.runLater(new Runnable(){
 	    	   @Override
 	    	   public void run() {
-	    	   mainTxt.appendText(messagei + "\n");
+	    
+	    	  mainTxt.appendText(messagei + "\n");
+	    		   
 	    	   }
 	       });
 	    	   
@@ -654,6 +693,7 @@ public class Screen extends Application{
 	
 	};
 	
+
 }
 
 		
