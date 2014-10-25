@@ -1,7 +1,3 @@
-package bchat;
-
-
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileWriter;
@@ -61,7 +57,8 @@ public class Screen extends Application{
 	private MenuItem aboutReadmeMenu = new MenuItem("Readme");			//MenuBar/Read me
 	private MenuItem aboutCredits = new MenuItem("Credits");			//MenuBar/Credits
 	private MenuItem aboutUpdate = new MenuItem("Check For Updates");	//MenuBar/Check For Update
-
+	private Menu connectionsMenu = new Menu("Connections");
+	private MenuItem connectConnectDialog = new MenuItem("Connect...");
 	//Networking variables.
 	BufferedReader reader;
 	PrintWriter writer;
@@ -84,30 +81,22 @@ public class Screen extends Application{
 		root.setTop(menuBar);
 		root.setCenter(rootBody);
 		root.setBottom(lbl2);
-		
+
 		//Ready bake code that lets you change the colour of the chat.
 		ColorPicker colorPicker = new ColorPicker(Color.BLACK);
-        colorPicker.valueProperty().addListener((observable, oldColor, newColor) ->
-            mainTxt.setStyle(
-              "-fx-text-fill: " + toRgbString(newColor) + ";"
-            )
-        );
-        
-        Scene scene = new Scene(new VBox(root,colorPicker),800,600);
-        
-        
+		colorPicker.valueProperty().addListener((observable, oldColor, newColor) ->
+		mainTxt.setStyle(
+				"-fx-text-fill: " + toRgbString(newColor) + ";"
+				)
+				);
 
-		
+		Scene scene = new Scene(new VBox(root,colorPicker),800,600);
 		primaryStage.setTitle(NAME);
 		primaryStage.setScene(scene);
 
 		//Method in charge of setting up the networking.
-		setUpNetworking();
+		//setUpNetworking();
 
-		//Thread that updates the UI when a new message is sent or received.
-		Thread th = new Thread(task);
-		th.setDaemon(true);
-		th.start();
 		primaryStage.show();
 
 		//'Send' Button Handler
@@ -134,7 +123,8 @@ public class Screen extends Application{
 		//Assembling The Menu Bar
 		fileMenu.getItems().addAll(saveChat1, new SeparatorMenuItem(), loadChat1, new SeparatorMenuItem(), fileChangeUserMenu, new SeparatorMenuItem(), fileExitMenu);
 		aboutMenu.getItems().addAll(aboutReadmeMenu, aboutCredits,aboutUpdate);
-		menuBar.getMenus().addAll(fileMenu, aboutMenu);
+		connectionsMenu.getItems().addAll(connectConnectDialog);
+		menuBar.getMenus().addAll(fileMenu, aboutMenu, connectionsMenu);
 
 		//Menu Bar Actions
 
@@ -196,6 +186,13 @@ public class Screen extends Application{
 				new updateDialog(Screen.this,results);
 			}
 
+		});
+
+		connectConnectDialog.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent c) {
+				new connectDialog(Screen.this);
+			}
 		});
 
 
@@ -539,6 +536,119 @@ public class Screen extends Application{
 	}
 	}
 
+	class connectDialog {Screen parent; Label lblConnectDialogHeader;TextField ipInputTxt;Button confirm;connectDialog(Screen parent){
+		this.parent=parent;
+		lblConnectDialogHeader = new Label();
+		lblConnectDialogHeader.setText("Enter the IP you wish to connect to");
+		lblConnectDialogHeader.setLayoutX(0);
+		lblConnectDialogHeader.setLayoutY(10);
+		lblConnectDialogHeader.requestFocus();
+
+		ipInputTxt = new TextField();
+		ipInputTxt.setLayoutX(10);
+		ipInputTxt.setLayoutY(30);
+		ipInputTxt.setPromptText("IP Address");
+
+		//Setting Layout Of New Connection IP Confirmation Button
+		confirm = new Button();
+		confirm.setText("OK");
+		confirm.setLayoutX(75);
+		confirm.setLayoutY(75);
+		//Confirmation Button Handler to confirm new Connection//
+		confirm.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent onClick) 
+			{
+				System.out.println("Connect To...");
+				setUpNetworking(ipInputTxt.getText());
+				//Thread that updates the UI when a new message is sent or received.
+				Thread th = new Thread(task);
+				th.setDaemon(true);
+				th.start();
+
+
+			}
+		});
+
+		Stage dialogStage = new Stage();
+		Pane dialogRoot = new Pane();
+		dialogStage.setScene(new Scene(dialogRoot, 200, 200));
+		dialogStage.setTitle("New Connection");
+		dialogRoot.getChildren().addAll(lblConnectDialogHeader,ipInputTxt ,confirm);
+		dialogStage.initStyle(StageStyle.UTILITY);
+		dialogStage.initModality(Modality.WINDOW_MODAL);
+		dialogStage.show();
+	}
+	}
+
+	class connectionFailedDialog {Screen parent; Label lblConnectionFailed;Button confirm;connectionFailedDialog(Screen parent){
+		this.parent=parent;
+		lblConnectionFailed = new Label();
+		lblConnectionFailed.setText("Connection Failed");
+		lblConnectionFailed.setLayoutX(50);
+		lblConnectionFailed.setLayoutY(10);
+
+		Stage dialogStage = new Stage();
+		Pane dialogRoot = new Pane();
+		dialogStage.setScene(new Scene(dialogRoot, 200, 200));
+		dialogStage.setTitle("Connection Failed");
+		dialogRoot.getChildren().addAll(lblConnectionFailed,confirm);
+		dialogStage.initStyle(StageStyle.UTILITY);
+		dialogStage.initModality(Modality.WINDOW_MODAL);
+		dialogStage.toFront();
+		dialogStage.show();
+
+		//Setting Layout Of New User Name Confirmation Button
+		confirm = new Button();
+		confirm.setText("OK");
+		confirm.setLayoutX(75);
+		confirm.setLayoutY(75);
+		//Confirmation Button Handler to confirm new User name//
+		confirm.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent onClick) 
+			{
+				dialogStage.close();
+			}
+		});
+	}
+	}
+
+	class connectionSuccessDialog {Screen parent; Label lblConnectionSuccess;Button confirm;connectionSuccessDialog(Screen parent){
+		this.parent=parent;
+		lblConnectionSuccess = new Label();
+		lblConnectionSuccess.setText("Connected to Server");
+		lblConnectionSuccess.setLayoutX(50);
+		lblConnectionSuccess.setLayoutY(10);
+
+		Stage dialogStage = new Stage();
+		Pane dialogRoot = new Pane();
+
+		dialogStage.setTitle("Connected");
+		dialogRoot.getChildren().addAll(lblConnectionSuccess,confirm);
+		dialogStage.initStyle(StageStyle.UTILITY);
+		dialogStage.initModality(Modality.WINDOW_MODAL);
+
+
+
+		//Setting Layout Of New User Name Confirmation Button
+		confirm = new Button();
+		confirm.setText("OK");
+		confirm.setLayoutX(75);
+		confirm.setLayoutY(75);
+		//Confirmation Button Handler to confirm new User name//
+		confirm.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent onClick) 
+			{
+				dialogStage.close();
+			}
+		});
+		dialogStage.setScene(new Scene(dialogRoot, 200, 200));
+		dialogStage.show();
+	}
+	}
+
 
 	//Button Handler To Confirm Update
 	EventHandler<ActionEvent> updateButtonHandler = new EventHandler<ActionEvent>(){
@@ -567,11 +677,12 @@ public class Screen extends Application{
 	 * sends it back to the client. This is done using chained readers. A dialog box appears informing the user of a successful connection.
 	 * 
 	 * This method and the Task thread act as the main bulk of the project. Hard to imagine considering the size of it.
+	 * @param targetIP 
 	 */
 
-	private void setUpNetworking() {
+	private void setUpNetworking(String targetIP) {
 		try {
-			sock = new Socket("localHost", 16261); ///////INSERT IP OF HOST HERE//////
+			sock = new Socket(targetIP, 16261); ///////INSERT IP OF HOST HERE//////
 			InputStreamReader streamReader = new InputStreamReader(sock.getInputStream());
 			reader = new BufferedReader(streamReader);
 			writer = new PrintWriter(sock.getOutputStream());
@@ -583,19 +694,18 @@ public class Screen extends Application{
 			ex.printStackTrace();
 		}
 	}
-	
+
 
 	private int to255Int(double d) {
-        return (int) (d * 255);
-    }
-	// AND THIS METHOD TOM!!!!!!!!!!!!!!!.
-	 private String toRgbString(Color colour) {
-	        return "rgb("
-	                          + to255Int(colour.getRed())
-	                    + "," + to255Int(colour.getGreen())
-	                    + "," + to255Int(colour.getBlue())
-	             + ")";
-	    }
+		return (int) (d * 255);
+	}
+	private String toRgbString(Color colour) {
+		return "rgb("
+				+ to255Int(colour.getRed())
+				+ "," + to255Int(colour.getGreen())
+				+ "," + to255Int(colour.getBlue())
+				+ ")";
+	}
 
 	/**
 	 * Have you ever seen Java cod so grand? Look at this beautiful thread. Un-phased by the Java FX UI thread,
